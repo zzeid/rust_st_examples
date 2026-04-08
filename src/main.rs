@@ -5,13 +5,12 @@
 // EN: Minimal example: connect → SELECT (abc, area, perimeter) → HTML report
 // LV: Minimāls piemērs: pieslēgums → SELECT (abc, area, perimeter) → HTML atskaite
 
-use postgres::{Client, NoTls};                    // EN: Postgres client / LV: Postgres klients
-use std::error::Error;                            // EN: Error trait for main() Result / LV: Kļūdu tips main() rezultātam
-use std::fs::File;                                // EN: For creating a file / LV: Faila izveidei
-use std::io::{BufWriter, Write};                  // EN: For writing bytes/text / LV: Rakstīšanai failā
+use postgres::{Client, NoTls}; // EN: Postgres client / LV: Postgres klients
+use std::error::Error; // EN: Error trait for main() Result / LV: Kļūdu tips main() rezultātam
+use std::fs::File; // EN: For creating a file / LV: Faila izveidei
+use std::io::Write; // EN: For writing bytes/text / LV: Rakstīšanai failā
 
-const DBPARAMETRI: &str =
-    "host=localhost user=postgres password=postgres dbname=postgres";
+const DBPARAMETRI: &str = "host=localhost user=postgres password=postgres dbname=postgres";
 // EN: Built-in connection string (adjust if needed)
 // LV: Iebūvēta savienojuma virkne (pielāgo, ja vajag)
 
@@ -70,9 +69,9 @@ th{{background:#f6f6f6}}
     // EN: 5) For each DB row → extract values → append a <tr> to HTML
     // LV: 5) Katrai DB rindai → paņemt vērtības → pievienot <tr> HTML failam
     for row in rows {
-        let abc: String = row.get("abc");      // EN: text label / LV: teksta apzīmējums
-        let area: f64 = row.get("area");       // EN: numeric area / LV: skaitliska platība
-        let per: f64 = row.get("perimeter");   // EN: numeric perimeter / LV: skaitlisks perimetrs
+        let abc: &str = row.get("abc"); // EN: text label / LV: teksta apzīmējums
+        let area: f64 = row.get("area"); // EN: numeric area / LV: skaitliska platība
+        let per: f64 = row.get("perimeter"); // EN: numeric perimeter / LV: skaitlisks perimetrs
 
         // EN: Basic HTML escaping for abc (safety); numbers are safe as-is
         // LV: Vienkārša HTML aizsardzība abc laukam; skaitļi droši kā ir
