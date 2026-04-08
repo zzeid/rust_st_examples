@@ -8,7 +8,7 @@
 use postgres::{Client, NoTls};                    // EN: Postgres client / LV: Postgres klients
 use std::error::Error;                            // EN: Error trait for main() Result / LV: Kļūdu tips main() rezultātam
 use std::fs::File;                                // EN: For creating a file / LV: Faila izveidei
-use std::io::Write;                               // EN: For writing bytes/text / LV: Rakstīšanai failā
+use std::io::{BufWriter, Write};                  // EN: For writing bytes/text / LV: Rakstīšanai failā
 
 const DBPARAMETRI: &str =
     "host=localhost user=postgres password=postgres dbname=postgres";
@@ -40,7 +40,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // EN: 3) Create HTML file to write the report
     // LV: 3) Izveidot HTML failu, kurā rakstīt atskaiti
-    let mut f = File::create(OUTPUT_HTML)?;
+    let f = File::create(OUTPUT_HTML)?;
+    let mut f = BufWriter::new(f);
 
     // EN: 4) Write minimal HTML header + table head
     // LV: 4) Uzrakstīt minimālo HTML galveni + tabulas virsrakstus
@@ -78,13 +79,16 @@ th{{background:#f6f6f6}}
         writeln!(
             f,
             "<tr><td>{}</td><td>{:.1}</td><td>{:.1}</td></tr>",
-            abc, area, per
+            escape_html(&abc),
+            area,
+            per
         )?;
     }
 
     // EN: 6) Close HTML tags and finish the file
     // LV: 6) Aizvērt HTML tagus un pabeigt failu
     writeln!(f, "</tbody></table></body></html>")?;
+    f.flush()?;
 
     // EN: 7) Tell user where the file is
     // LV: 7) Parādīt ceļu līdz failam
@@ -95,3 +99,19 @@ th{{background:#f6f6f6}}
     Ok(())
 }
 
+/// EN: Escapes HTML special characters to prevent XSS
+/// LV: Eskapē HTML speciālos simbolus, lai novērstu XSS
+fn escape_html(s: &str) -> String {
+    let mut escaped = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '&' => escaped.push_str("&amp;"),
+            '"' => escaped.push_str("&quot;"),
+            '\'' => escaped.push_str("&#39;"),
+            _ => escaped.push(c),
+        }
+    }
+    escaped
+}
